@@ -115,6 +115,17 @@ describe "openstack-dashboard::server" do
         expect(@chef_run).to create_file_with_content @file.name, "docs.openstack.org"
       end
 
+      it "does not override temp dir when it is nil" do
+        node.set["openstack"]["dashboard"]["file_upload_temp_dir"] = nil
+        expect(@chef_run).not_to(
+          create_file_with_content @file.name, "FILE_UPLOAD_TEMP_DIR =")
+      end
+      it "does override temp dir when it is not nil" do
+        node.set["openstack"]["dashboard"]["file_upload_temp_dir"] = "/foobar"
+        expect(@chef_run).to(
+          create_file_with_content @file.name, "FILE_UPLOAD_TEMP_DIR = /foobar")
+      end
+
       it "configures CSRF_COOKIE_SECURE & SESSION_COOKIE_SECURE when use_ssl is true" do
         expect(@chef_run).to create_file_with_content @file.name, "CSRF_COOKIE_SECURE = True"
         expect(@chef_run).to create_file_with_content @file.name, "SESSION_COOKIE_SECURE = True"
